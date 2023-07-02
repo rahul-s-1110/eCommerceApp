@@ -9,7 +9,7 @@ import React, { useState } from "react";
 import { TextInput } from "react-native-gesture-handler";
 import {
   MaterialCommunityIcons,
-  Octicons,
+  Octicons,Entypo ,
   AntDesign,
 } from "@expo/vector-icons";
 import { colors, titles, btn1, hr80 } from "../global/style";
@@ -26,37 +26,17 @@ const SignupScreen = ({navigation}) => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [customError, setCustomError] = useState('');
+  const [successMsg,setSuccessmsg] = useState(null);
 
   const handlelogin = () => {
+    setSuccessmsg(null)
     try {
       createUserWithEmailAndPassword(auth,email, password)
           .then((userCredentials) => {
-              console.log(userCredentials?.user.uid);
-              console.log('user created')
-              // setSuccessmsg('User created successfully')
-              if (userCredentials?.user.uid != null) {
-                  const userRef = firebase.firestore().collection('UserData')
-                  userRef.add(
-                      {
-                          email: email,
-                          password: password,
-                          // cpassword: cpassword,
-                          phone: phone,
-                          name: name,
-                          address: address,
-                          uid: userCredentials?.user?.uid,
-                      }
-                  ).then(() => {
-                      console.log('data added to firestore')
-                      setSuccessmsg('User created successfully')
-                  }).catch((error) => {
-                      console.log('firestore error ', error)
-                  }
-
-                  )
-              }
-
-
+              setSuccessmsg("User Created SuccessFull")
+              var user = userCredentials.user;
+              dispatch(setUser(user));
+              navigation.replace('home');
           })
           .catch((error) => {
               console.log('sign up firebase error ', error.message)
@@ -77,15 +57,12 @@ const SignupScreen = ({navigation}) => {
   catch (error) {
       console.log('sign up system error ', error.message)
   }
-
-
-
   };
 
   return (
     <View style={styles.androidSafeArea}>
       <Text style={styles.head1}>Sign Up</Text>
-
+      {customError !== '' && <Text style={styles.errormsg}>{customError}</Text>}
       <View style={styles.inputout}>
         <AntDesign
           name="user"
@@ -99,16 +76,15 @@ const SignupScreen = ({navigation}) => {
             setNameFocus(true);
             setEmailfocus(false);
             setPasswordfocus(false);
-            // setcustomError("");
+            setCustomError("");
           }}
-          secureTextEntry={showpassword === false ? true : false}
           onChangeText={(text) => setPassword(text)}
         />
       </View>
 
       <View style={styles.inputout}>
-        <AntDesign
-          name="user"
+        <Entypo
+          name="email"
           size={24}
           color={emailfocus === true ? colors.text1 : colors.text2}
         />
@@ -120,7 +96,7 @@ const SignupScreen = ({navigation}) => {
             setPasswordfocus(false);
             setShowpassword(false);
             setNameFocus(false);
-            // setcustomError('')
+            setCustomError('')
           }}
           onChangeText={(text) => setEmail(text)}
         />
@@ -139,7 +115,7 @@ const SignupScreen = ({navigation}) => {
             setEmailfocus(false);
             setPasswordfocus(true);
             setNameFocus(false);
-            // setcustomError("");
+            setCustomError("");
           }}
           secureTextEntry={showpassword === false ? true : false}
           onChangeText={(text) => setPassword(text)}
@@ -174,6 +150,7 @@ const SignupScreen = ({navigation}) => {
           Log In
         </Text>
       </Text>
+      {successMsg == null?null:<Text>{successMsg}</Text>}
     </View>
   );
 };
@@ -217,4 +194,14 @@ const styles = StyleSheet.create({
   signup: {
     color: colors.text1,
   },
+  errormsg: {
+    color: 'red',
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 10,
+    borderColor: 'red',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+},
 });

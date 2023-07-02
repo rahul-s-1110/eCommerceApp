@@ -1,16 +1,17 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import NavigationScreen from './app/navigation/navigationScreen';
-import LoginScreen from './app/screens/loginScreen';
+import { StyleSheet } from "react-native";
+import NavigationScreen from "./app/navigation/navigationScreen";
+import { Provider } from "react-redux";
+import { persistor,store } from "./app/redux/store";
+import { PersistGate } from "redux-persist/integration/react";
 
 export default function App() {
   return (
-    // <View style={{flex:1}}  >
-    //   <LoginScreen />
-    // </View>
-    <NavigationScreen />
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <NavigationScreen />
+      </PersistGate>
+    </Provider>
   );
 }
 
-const styles = StyleSheet.create({
-});
+const styles = StyleSheet.create({});

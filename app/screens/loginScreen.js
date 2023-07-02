@@ -5,44 +5,93 @@ import {
   StatusBar,
   TouchableOpacity,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TextInput } from "react-native-gesture-handler";
 import {
   MaterialCommunityIcons,
   Octicons,
-  AntDesign,
+  Entypo,
 } from "@expo/vector-icons";
 import { colors, titles, btn1, hr80 } from "../global/style";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase";
+import { setUser } from "../redux/authReducer";
+import { useDispatch, useSelector } from "react-redux";
+import { useMemo } from "react";
 
 const LoginScreen = ({navigation}) => {
+
+  const product = useSelector((state) => state.auth.auth)
+
+  // useMemo(()=>{
+  //   console.log("auth si ",product)
+  // },[product])
+
+
+  const dispatch = useDispatch();
   const [emailfocus, setEmailfocus] = useState(false);
   const [passwordfocus, setPasswordfocus] = useState(false);
   const [showpassword, setShowpassword] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [customError,setcustomError] = useState('');
+  const [loading,setLoading] = useState(false);
+
+
+  useEffect(() => {
+    setLoading(true);
+    const unsuscribe = auth.onAuthStateChanged((authUser) => {
+      if (!authUser) {
+        setLoading(false);
+      }
+      if (authUser) {
+        console.log("auth user available");
+        navigation.navigate('home')
+      }
+    });
+    return unsuscribe;
+  }, []);
 
   const handlelogin = () => {
-    console.log("btn");
-  };
+      signInWithEmailAndPassword(auth,email, password)
+        .then((userCredential) => {
+            var user = userCredential.user;
+            dispatch(setUser(user));
+            navigation.replace('home')
+        })
+        .catch((error) => {
+            var errorMessage = error.message;
+            console.log(errorMessage);
+            if (errorMessage === 'Firebase: The email address is badly formatted. (auth/invalid-email).'
+            ) {
+                setcustomError('Please enter a valid email address')
+            }
+            else {
+                setcustomError('Incorrect email or password')
+            }
+        })
+}
 
   return (
     <View style={styles.androidSafeArea}>
       <Text style={styles.head1}>Log In</Text>
+      {customError !== '' && <Text style={styles.errormsg}>{customError}</Text>}
       <View style={styles.inputout}>
-        <AntDesign
-          name="user"
+        <Entypo
+          name="email"
           size={24}
           color={emailfocus === true ? colors.text1 : colors.text2}
         />
         <TextInput
           style={styles.input}
           placeholder="Email"
+          keyboardType="email-address"
           onFocus={() => {
             setEmailfocus(true);
             setPasswordfocus(false);
             setShowpassword(false);
-            // setcustomError('')
+            setcustomError('')
           }}
           onChangeText={(text) => setEmail(text)}
         />
@@ -60,7 +109,7 @@ const LoginScreen = ({navigation}) => {
           onFocus={() => {
             setEmailfocus(false);
             setPasswordfocus(true);
-            // setcustomError("");
+            setcustomError("");
           }}
           secureTextEntry={showpassword === false ? true : false}
           onChangeText={(text) => setPassword(text)}
@@ -138,4 +187,14 @@ const styles = StyleSheet.create({
   signup: {
     color: colors.text1,
   },
+  errormsg: {
+    color: 'red',
+    fontSize: 18,
+    textAlign: 'center',
+    marginTop: 10,
+    borderColor: 'red',
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+},
 });
