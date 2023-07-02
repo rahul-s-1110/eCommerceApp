@@ -85,16 +85,7 @@ const CartScreen = () => {
                         dispatch(decrementQty(item)); //product
                         dispatch(decrementQuantity(item)); //cart
                       }}
-                      style={{
-                        width: 26,
-                        height: 26,
-                        borderRadius: 13,
-                        borderColor: "#BEBEBE",
-                        backgroundColor: "#E0E0E0",
-                        justifyContent: "center",
-                        alignContent: "center",
-                      }}
-                    >
+                      style={styles.btnQtyTxt}>
                       <Text
                         style={{
                           fontSize: 20,
@@ -126,16 +117,7 @@ const CartScreen = () => {
                         dispatch(incrementQuantity(item));
                         dispatch(incremetQty(item));
                       }}
-                      style={{
-                        width: 26,
-                        height: 26,
-                        borderRadius: 13,
-                        borderColor: "#BEBEBE",
-                        backgroundColor: "#E0E0E0",
-                        justifyContent: "center",
-                        alignContent: "center",
-                      }}
-                    >
+                      style={styles.btnQtyTxt}>
                       <Text
                         style={{
                           fontSize: 20,
@@ -171,4 +153,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: Platform.OS === "android" ? 5 : 0,
   },
+  btnQtyTxt:{
+    width: 26,
+                        height: 26,
+                        borderRadius: 13,
+                        borderColor: "#BEBEBE",
+                        backgroundColor: "#E0E0E0",
+                        justifyContent: "center",
+                        alignContent: "center",
+  }
 });
